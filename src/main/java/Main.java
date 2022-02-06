@@ -29,7 +29,7 @@ public class Main {
             );
             boolean solved = false;
             while (!solved) {
-                String word = null;
+                String word;
                 Page page = browser.newPage();
                 page.navigate("https://www.powerlanguage.co.uk/wordle/");
                 page.click("game-icon[icon='close']");
@@ -66,19 +66,15 @@ public class Main {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-
-            System.exit(1);
         }
+        System.exit(1);
     }
 
     /**
      * There can be words which are not in the wordle db, it will clear them
-     *
-     * @param page
-     * @throws InterruptedException
+     * @param page : The current working web page
      */
-    static void clear(Page page) throws InterruptedException {
+    static void clear(Page page)  {
         for (int i = 0; i < 5; i++) {
             page.click("game-icon[icon=backspace]");
         }
@@ -86,16 +82,15 @@ public class Main {
     }
 
     static List<String> updateWords(List<String> currentWords) {
-        List<String> updaedWords = currentWords.stream().filter(filter()).toList();
-        return updaedWords;
+        return currentWords.stream().filter(filter()).toList();
     }
 
-    static void typeWord(Page page, String word) throws InterruptedException {
+    static void typeWord(Page page, String word) {
         for (char c : word.toCharArray()) {
             page.click("button[data-key=" + c + "]");
         }
         page.locator("text=enter").click();
-        page.waitForTimeout(1500);
+        page.waitForTimeout(2000);
     }
 
     static Integer evaluate(Page page, String word, int row) {
@@ -129,31 +124,26 @@ public class Main {
     static Predicate<String> filter() {
         //Remove all present fom notPresent and contails - Because of double letter words
         notPresent.removeAll(present);
-
         notPresent.removeAll(atPos.values());
 
-        Predicate<String> filter = new Predicate<String>() {
-            @Override
-            public boolean test(String s) {
-                boolean np = notPresent.stream().allMatch(character -> s.indexOf(character) < 0);
-                if (!np) return false;
-                boolean p = present.stream().allMatch(character -> s.indexOf(character) >= 0);
-                if (!p) return false;
-                Boolean positionVerified = true;
-                Set<Integer> set = atPos.keySet();
-                for (Integer pos : set) {
-                    if (s.charAt(pos) != atPos.get(pos)) {
-                        return false;
-                    }
+        return s -> {
+            boolean np = notPresent.stream().allMatch(character -> s.indexOf(character) < 0);
+            if (!np) return false;
+            boolean p = present.stream().allMatch(character -> s.indexOf(character) >= 0);
+            if (!p) return false;
+            Boolean positionVerified = true;
+            Set<Integer> set = atPos.keySet();
+            for (Integer pos : set) {
+                if (s.charAt(pos) != atPos.get(pos)) {
+                    return false;
                 }
-
-                return true;
             }
+
+            return true;
         };
-        return filter;
     }
 
-    static List<String> load() throws URISyntaxException, IOException {
+    static List<String> load() {
      Main m = new Main();
         try (InputStream in = m.getClass().getResourceAsStream("/words.txt");
              BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
