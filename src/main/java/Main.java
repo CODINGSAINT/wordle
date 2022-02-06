@@ -3,10 +3,16 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,9 +47,6 @@ public class Main {
                     //evaluate
                     Integer evaluate = null;
                     while (evaluate == null) {
-                 /*   if (trials == 0)
-                        word = "aldol";
-                    else*/
                         word = words.get(new Random().nextInt(0, words.size()));
                         System.out.println("Evaluating word \t" + word);
                         typeWord(page, word);
@@ -86,7 +89,7 @@ public class Main {
         for (int i = 0; i < 5; i++) {
             page.click("game-icon[icon=backspace]");
         }
-        page.waitForTimeout(1000);
+        page.waitForTimeout(1500);
     }
 
     static List<String> updateWords(List<String> currentWords) {
@@ -157,11 +160,14 @@ public class Main {
         return filter;
     }
 
-    static List<String> load() {
-        URL resource =  Thread.currentThread().getContextClassLoader().getResource("words.txt");
-        try (Stream<String> lines = Files.readAllLines(new File(resource.getFile()).toPath()).stream()) {
-            return lines.collect(Collectors.toList());
-        } catch (IOException e) {
+    static List<String> load() throws URISyntaxException, IOException {
+     Main m = new Main();
+        try (InputStream in = m.getClass().getResourceAsStream("/words.txt");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            return reader.lines().toList();
+        }
+
+         catch (IOException e) {
             e.printStackTrace();
         }
         return List.of();
