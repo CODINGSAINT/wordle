@@ -84,7 +84,7 @@ public class Main {
      */
     static void clear(Page page) throws InterruptedException {
         for (int i = 0; i < 5; i++) {
-            page.click("button[data-key=←]");
+            page.click("game-icon[icon=backspace]");
         }
         page.waitForTimeout(1000);
     }
@@ -98,7 +98,7 @@ public class Main {
         for (char c : word.toCharArray()) {
             page.click("button[data-key=" + c + "]");
         }
-        page.click("button[data-key=↵]");
+        page.locator("text=enter").click();
         page.waitForTimeout(1500);
     }
 
@@ -158,9 +158,7 @@ public class Main {
     }
 
     static List<String> load() {
-        Main m = new Main();
-        ClassLoader classLoader = m.getClass().getClassLoader();
-        URL resource = classLoader.getResource("words.txt");
+        URL resource =  Thread.currentThread().getContextClassLoader().getResource("words.txt");
         try (Stream<String> lines = Files.readAllLines(new File(resource.getFile()).toPath()).stream()) {
             return lines.collect(Collectors.toList());
         } catch (IOException e) {
