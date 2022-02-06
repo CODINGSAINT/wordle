@@ -15,3 +15,10 @@ Steps are simple
 It required
 - Java 17
 - Playwright 1.17.0
+
+#Run it 
+With Java 17+ and maven install
+```
+mvn clean install 
+java -jar .\target\wordle-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
