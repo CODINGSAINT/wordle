@@ -3,11 +3,15 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
+import java.util.List;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -60,9 +64,22 @@ public class Main {
 
                         }
                     }
+                   if(solved)
+                         break;
                 }
+                page.waitForTimeout(2000);
+                page.click("#share-button");
+                page.click("game-icon[icon='close']");
+                System.out.println("The Sharable Text has been copied and can be shared ");
+                Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Transferable t = c.getContents(page);
+                if(t!=null)
+                System.out.println((String) t.getTransferData(DataFlavor.stringFlavor));
+                page.close();
+
 
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
